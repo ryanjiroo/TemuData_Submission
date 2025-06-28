@@ -78,7 +78,7 @@ export default function OrderHistory({ auth }) {
                                                 <p className="mt-1 text-sm font-semibold text-gray-900">{order.id}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs font-medium text-gray-500 uppercase">Tanggal ditempatkan</p>
+                                                <p className="text-xs font-medium text-gray-500 uppercase">Tanggal pemesanan</p>
                                                 <p className="mt-1 text-sm font-semibold text-gray-900">{new Date(order.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                             </div>
                                             <div>
