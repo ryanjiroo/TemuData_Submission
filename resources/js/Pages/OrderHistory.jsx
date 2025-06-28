@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head,Link, usePage } from '@inertiajs/react';
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import axios from 'axios';
@@ -13,17 +13,15 @@ export default function OrderHistory({ auth }) {
     useEffect(() => {
         const fetchOrders = async () => {
             if (!auth.user) {
-                // Set error dan pastikan orders kosong jika pengguna tidak login
                 setError('Anda harus login untuk melihat riwayat pesanan.');
                 setLoading(false);
-                setOrders([]);
+                setOrders([]); // Pastikan orders kosong jika tidak login
                 return;
             }
 
             try {
                 const response = await axios.get(route('api.orders'));
-                // Pastikan response.data.orders adalah array. Jika null atau undefined, set ke array kosong.
-                setOrders(response.data.orders || []);
+                setOrders(response.data.orders || []); // Pastikan selalu array
             } catch (err) {
                 console.error('Gagal mengambil riwayat order:', err);
                 if (err.response && err.response.status === 401) {
@@ -31,8 +29,7 @@ export default function OrderHistory({ auth }) {
                 } else {
                     setError('Terjadi kesalahan saat memuat riwayat pesanan.');
                 }
-                // Pastikan orders kosong jika ada error
-                setOrders([]);
+                setOrders([]); // Pastikan orders kosong jika ada error
             } finally {
                 setLoading(false);
             }
@@ -186,5 +183,6 @@ export default function OrderHistory({ auth }) {
                 <Footer />
             </div>
         </>
+
     );
 }
