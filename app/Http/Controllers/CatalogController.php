@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\URL; // Tambahkan ini
+use Illuminate\Support\Facades\URL;
 
 class CatalogController extends Controller
 {
@@ -76,7 +76,7 @@ class CatalogController extends Controller
             $itemTotal = $item->price * $item->quantity;
             $subtotal += $itemTotal;
 
-            if ($item->catalog) { // Pastikan item->catalog tidak null
+            if ($item->catalog) {
                 if ($item->catalog->file) {
                     if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
                         $item->catalog->file_url = $item->catalog->file;
@@ -87,7 +87,7 @@ class CatalogController extends Controller
                     $item->catalog->file_url = null;
                 }
             } else {
-                $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
+                $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan'];
             }
             return $item;
         });
@@ -163,6 +163,7 @@ class CatalogController extends Controller
         return response()->json(['message' => 'Produk berhasil ditambahkan ke keranjang!', 'cartItemCount' => $cart->items()->sum('quantity')]);
     }
 
+
     public function updateCartItem(Request $request, CartItem $cartItem)
     {
         $cart = $this->getCurrentCart($request);
@@ -217,18 +218,14 @@ class CatalogController extends Controller
 
         return Inertia::render('Checkout', [
             'cartItems' => $cart->items->map(function ($item) {
-                if ($item->catalog) { // Pastikan item->catalog tidak null
-                    if ($item->catalog->file) {
-                        if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
-                            $item->catalog->file_url = $item->catalog->file;
-                        } else {
-                            $item->catalog->file_url = Storage::url($item->catalog->file);
-                        }
+                if ($item->catalog) {
+                    if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
+                        $item->catalog->file_url = $item->catalog->file;
                     } else {
-                        $item->catalog->file_url = null;
+                        $item->catalog->file_url = Storage::url($item->catalog->file);
                     }
                 } else {
-                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
+                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan'];
                 }
                 return $item;
             }),
@@ -293,10 +290,11 @@ class CatalogController extends Controller
         }
     }
 
-    public function getOrderHistory(Request $request)
+    // MODIFIKASI: Method ini sekarang akan me-render halaman Inertia
+    public function showOrderHistoryPage(Request $request)
     {
         if (!$request->user()) {
-            return response()->json(['message' => 'Unauthorized. Harap login untuk melihat riwayat pesanan.'], 401);
+            return redirect()->route('login')->with('error', 'Anda harus login untuk melihat riwayat pesanan.');
         }
 
         $orders = Order::where('user_id', $request->user()->id)
@@ -304,9 +302,9 @@ class CatalogController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $orders = $orders->map(function ($order) {
-            $order->items->map(function ($item) {
-                if ($item->catalog) { // Pastikan item->catalog tidak null
+        $orders->each(function ($order) {
+            $order->items->each(function ($item) {
+                if ($item->catalog) { 
                     if ($item->catalog->file) {
                         if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
                             $item->catalog->file_url = $item->catalog->file;
@@ -317,13 +315,16 @@ class CatalogController extends Controller
                         $item->catalog->file_url = null;
                     }
                 } else {
-                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
+                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan'];
                 }
-                return $item;
             });
-            return $order;
         });
 
-        return response()->json(['orders' => $orders]);
+        return Inertia::render('OrderHistory', [
+            'orders' => $orders,
+            'auth' => ['user' => $request->user()],
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
     }
 }
