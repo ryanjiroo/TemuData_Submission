@@ -8,7 +8,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <Head title="Home" />
 
             <div className="relative min-h-screen bg-gray-100 font-sans antialiased text-gray-900">
-                <div className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/works.jpg')" }}>
+                <div className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('https://raw.githubusercontent.com/ryanjiroo/TemuData_Submission/refs/heads/main/public/images/works.jpg')" }}>
                     <div className="absolute inset-0 bg-black opacity-50"></div>
 
                     <div className="relative z-10 flex flex-col h-full">
@@ -47,7 +47,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <div className="space-y-8">
                             <div className="bg-[#C7FFD8] rounded-lg overflow-hidden shadow-md">
                                 <img
-                                    src="/images/team_learning.jpg"
+                                    src="https://raw.githubusercontent.com/ryanjiroo/TemuData_Submission/refs/heads/main/public/images/works.jpg"
                                     alt="Team Learning"
                                     className="w-full h-auto object-cover rounded-lg"
                                 />
