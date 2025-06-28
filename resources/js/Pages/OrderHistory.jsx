@@ -5,43 +5,9 @@ import Footer from '@/Components/Footer';
 import axios from 'axios';
 
 export default function OrderHistory({ auth }) {
-    const [orders, setOrders] = useState([]); // Inisialisasi orders sebagai array kosong
-    const [loading, setLoading] = useState(true); // State untuk menunjukkan sedang memuat
-    const [error, setError] = useState(null); // State untuk error
-    const [message, setMessage] = useState(null); // State untuk flash messages
+    const { orders } = usePage().props;
+    const [message, setMessage] = useState(null);
 
-    // Efek untuk mengambil data pesanan saat komponen dimuat atau auth.user berubah
-    useEffect(() => {
-        const fetchOrders = async () => {
-            if (!auth.user) {
-                // Jika tidak login, set error, hentikan loading, dan pastikan orders kosong
-                setError('Anda harus login untuk melihat riwayat pesanan.');
-                setLoading(false);
-                setOrders([]);
-                return;
-            }
-
-            try {
-                const response = await axios.get(route('api.orders')); // Lakukan panggilan API
-                // Pastikan response.data.orders adalah array. Jika null atau undefined, set ke array kosong.
-                setOrders(response.data.orders || []);
-            } catch (err) {
-                console.error('Gagal mengambil riwayat order:', err);
-                if (err.response && err.response.status === 401) {
-                    setError('Sesi Anda berakhir atau Anda belum login. Silakan login kembali.');
-                } else {
-                    setError('Terjadi kesalahan saat memuat riwayat pesanan.');
-                }
-                setOrders([]); // Pastikan orders kosong jika ada error
-            } finally {
-                setLoading(false); // Selesai memuat
-            }
-        };
-
-        fetchOrders(); // Panggil fungsi pengambilan data
-    }, [auth.user]); // Dependencies: panggil ulang jika auth.user berubah
-
-    // Efek untuk menangani flash messages dari Laravel (mirip Catalog.jsx)
     const { flash } = usePage().props;
     useEffect(() => {
         if (flash && flash.success) {
@@ -78,36 +44,6 @@ export default function OrderHistory({ auth }) {
         }
     };
 
-    // Tampilan Loading
-    if (loading) {
-        return (
-            <div className="bg-[#F6F6F6] min-h-screen font-sans antialiased text-gray-900 flex justify-center items-center">
-                Memuat riwayat pesanan...
-            </div>
-        );
-    }
-
-    // Tampilan Error
-    if (error) {
-        return (
-            <div className="bg-[#F6F6F6] min-h-screen font-sans antialiased text-gray-900">
-                <Navbar auth={auth} />
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
-                    <div className="bg-white rounded-lg shadow-xl p-8 md:p-12 text-red-600">
-                        <p>{error}</p>
-                        {!auth.user && (
-                            <Link href={route('login')} className="mt-4 inline-block bg-[#161D6F] text-white font-semibold py-2 px-4 rounded-md hover:bg-opacity-90 transition">
-                                Login Sekarang
-                            </Link>
-                        )}
-                    </div>
-                </div>
-                <Footer />
-            </div>
-        );
-    }
-
-    // Tampilan Utama (jika tidak loading dan tidak ada error)
     return (
         <>
             <Head title="Riwayat Pesanan" />
@@ -126,14 +62,14 @@ export default function OrderHistory({ auth }) {
                         </div>
                     )}
 
-                    {orders.length === 0 ? ( // Menampilkan pesan jika tidak ada pesanan
+                    {orders && orders.length === 0 ? (
                         <div className="bg-white rounded-lg shadow-md p-8 text-center">
                             <p className="text-gray-600 text-lg mb-4">Anda belum memiliki pesanan.</p>
                             <p className="text-gray-500">Mulai belanja dari <Link href={route('catalogs')} className="text-[#161D6F] hover:underline">katalog</Link> kami!</p>
                         </div>
                     ) : (
                         <div className="space-y-8">
-                            {orders.map((order) => ( // Melakukan map jika ada pesanan
+                            {orders && orders.map((order) => (
                                 <div key={order.id} className="bg-white rounded-lg shadow-sm">
                                     <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
