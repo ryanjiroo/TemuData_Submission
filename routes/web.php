@@ -5,6 +5,7 @@ use App\Http\Controllers\CatalogController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\URL; // Tambahkan ini
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -16,6 +17,14 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::middleware('auth')->group(function () {
+    // Force HTTPS for all generated URLs in production
+    // Ini harus ada di AppServiceProvider.php::boot() method, bukan di sini,
+    // tapi saya tambahkan di sini sebagai fallback sementara jika AppServiceProvider tidak terpanggil.
+    // Namun, AppServiceProvider adalah tempat yang benar untuknya.
+    if (env('APP_ENV') === 'production') {
+        URL::forceScheme('https');
+    }
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
