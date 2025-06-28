@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\URL; // Tambahkan ini
 
 class CatalogController extends Controller
 {
@@ -75,14 +76,18 @@ class CatalogController extends Controller
             $itemTotal = $item->price * $item->quantity;
             $subtotal += $itemTotal;
 
-            if ($item->catalog->file) {
-                if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
-                    $item->catalog->file_url = $item->catalog->file;
+            if ($item->catalog) { // Pastikan item->catalog tidak null
+                if ($item->catalog->file) {
+                    if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
+                        $item->catalog->file_url = $item->catalog->file;
+                    } else {
+                        $item->catalog->file_url = Storage::url($item->catalog->file);
+                    }
                 } else {
-                    $item->catalog->file_url = Storage::url($item->catalog->file);
+                    $item->catalog->file_url = null;
                 }
             } else {
-                $item->catalog->file_url = null;
+                $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
             }
             return $item;
         });
@@ -127,7 +132,6 @@ class CatalogController extends Controller
         return back()->with('success', 'Item berhasil ditambahkan ke keranjang!');
     }
 
-    // NEW METHOD: reAddToCart
     public function reAddToCart(Request $request)
     {
         $request->validate([
@@ -156,10 +160,8 @@ class CatalogController extends Controller
             ]);
         }
 
-        // Return JSON response for API call
         return response()->json(['message' => 'Produk berhasil ditambahkan ke keranjang!', 'cartItemCount' => $cart->items()->sum('quantity')]);
     }
-
 
     public function updateCartItem(Request $request, CartItem $cartItem)
     {
@@ -215,14 +217,18 @@ class CatalogController extends Controller
 
         return Inertia::render('Checkout', [
             'cartItems' => $cart->items->map(function ($item) {
-                if ($item->catalog->file) {
-                    if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
-                        $item->catalog->file_url = $item->catalog->file;
+                if ($item->catalog) { // Pastikan item->catalog tidak null
+                    if ($item->catalog->file) {
+                        if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
+                            $item->catalog->file_url = $item->catalog->file;
+                        } else {
+                            $item->catalog->file_url = Storage::url($item->catalog->file);
+                        }
                     } else {
-                        $item->catalog->file_url = Storage::url($item->catalog->file);
+                        $item->catalog->file_url = null;
                     }
                 } else {
-                    $item->catalog->file_url = null;
+                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
                 }
                 return $item;
             }),
@@ -300,14 +306,18 @@ class CatalogController extends Controller
 
         $orders = $orders->map(function ($order) {
             $order->items->map(function ($item) {
-                if ($item->catalog && $item->catalog->file) {
-                    if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
-                        $item->catalog->file_url = $item->catalog->file;
+                if ($item->catalog) { // Pastikan item->catalog tidak null
+                    if ($item->catalog->file) {
+                        if (filter_var($item->catalog->file, FILTER_VALIDATE_URL)) {
+                            $item->catalog->file_url = $item->catalog->file;
+                        } else {
+                            $item->catalog->file_url = Storage::url($item->catalog->file);
+                        }
                     } else {
-                        $item->catalog->file_url = Storage::url($item->catalog->file);
+                        $item->catalog->file_url = null;
                     }
                 } else {
-                    $item->catalog_file_url = null;
+                    $item->catalog = (object)['file_url' => null, 'title' => 'Produk Tidak Ditemukan']; // Default jika catalog null
                 }
                 return $item;
             });
