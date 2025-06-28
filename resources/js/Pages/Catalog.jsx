@@ -118,7 +118,6 @@ function Catalog({ catalogs, auth }) {
                                             />
                                             <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white rounded-full px-2 py-1 text-xs font-semibold flex items-center">
                                                 <PlayIcon />
-                                                <span className="ml-1">27 videos</span>
                                             </div>
                                             <div className="absolute top-2 right-2 bg-white text-gray-700 rounded-full px-2 py-1 text-xs font-semibold flex items-center shadow-sm">
                                                 <StarIcon />
