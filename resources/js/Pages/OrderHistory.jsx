@@ -5,23 +5,26 @@ import Footer from '@/Components/Footer';
 import axios from 'axios';
 
 export default function OrderHistory({ auth }) {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [message, setMessage] = useState(null);
+    const [orders, setOrders] = useState([]); // Inisialisasi orders sebagai array kosong
+    const [loading, setLoading] = useState(true); // State untuk menunjukkan sedang memuat
+    const [error, setError] = useState(null); // State untuk error
+    const [message, setMessage] = useState(null); // State untuk flash messages
 
+    // Efek untuk mengambil data pesanan saat komponen dimuat atau auth.user berubah
     useEffect(() => {
         const fetchOrders = async () => {
             if (!auth.user) {
+                // Jika tidak login, set error, hentikan loading, dan pastikan orders kosong
                 setError('Anda harus login untuk melihat riwayat pesanan.');
                 setLoading(false);
-                setOrders([]); // Pastikan orders kosong jika tidak login
+                setOrders([]);
                 return;
             }
 
             try {
-                const response = await axios.get(route('api.orders'));
-                setOrders(response.data.orders || []); // Pastikan selalu array
+                const response = await axios.get(route('api.orders')); // Lakukan panggilan API
+                // Pastikan response.data.orders adalah array. Jika null atau undefined, set ke array kosong.
+                setOrders(response.data.orders || []);
             } catch (err) {
                 console.error('Gagal mengambil riwayat order:', err);
                 if (err.response && err.response.status === 401) {
@@ -31,12 +34,30 @@ export default function OrderHistory({ auth }) {
                 }
                 setOrders([]); // Pastikan orders kosong jika ada error
             } finally {
-                setLoading(false);
+                setLoading(false); // Selesai memuat
             }
         };
 
-        fetchOrders();
-    }, [auth.user]);
+        fetchOrders(); // Panggil fungsi pengambilan data
+    }, [auth.user]); // Dependencies: panggil ulang jika auth.user berubah
+
+    // Efek untuk menangani flash messages dari Laravel (mirip Catalog.jsx)
+    const { flash } = usePage().props;
+    useEffect(() => {
+        if (flash && flash.success) {
+            setMessage({ type: 'success', text: flash.success });
+        } else if (flash && flash.error) {
+            setMessage({ type: 'error', text: flash.error });
+        } else if (flash && flash.message) {
+            setMessage({ type: 'info', text: flash.message });
+        } else if (flash && flash.errors && Object.keys(flash.errors).length > 0) {
+            const validationErrors = Object.values(flash.errors).map(e => e[0]).join(', ');
+            setMessage({ type: 'error', text: `Validasi gagal: ${validationErrors}` });
+        }
+
+        const timer = setTimeout(() => setMessage(null), 5000);
+        return () => clearTimeout(timer);
+    }, [flash]);
 
     const handleBuyAgain = async (catalogId, quantity) => {
         if (!window.confirm(`Apakah Anda yakin ingin menambahkan ${quantity} item ini kembali ke keranjang?`)) {
@@ -57,6 +78,7 @@ export default function OrderHistory({ auth }) {
         }
     };
 
+    // Tampilan Loading
     if (loading) {
         return (
             <div className="bg-[#F6F6F6] min-h-screen font-sans antialiased text-gray-900 flex justify-center items-center">
@@ -65,6 +87,7 @@ export default function OrderHistory({ auth }) {
         );
     }
 
+    // Tampilan Error
     if (error) {
         return (
             <div className="bg-[#F6F6F6] min-h-screen font-sans antialiased text-gray-900">
@@ -84,6 +107,7 @@ export default function OrderHistory({ auth }) {
         );
     }
 
+    // Tampilan Utama (jika tidak loading dan tidak ada error)
     return (
         <>
             <Head title="Riwayat Pesanan" />
@@ -91,7 +115,6 @@ export default function OrderHistory({ auth }) {
                 <div className='bg-white'>
                     <Navbar auth={auth} />
                 </div>
-
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Riwayat Pesanan</h1>
@@ -103,14 +126,14 @@ export default function OrderHistory({ auth }) {
                         </div>
                     )}
 
-                    {orders.length === 0 ? (
+                    {orders.length === 0 ? ( // Menampilkan pesan jika tidak ada pesanan
                         <div className="bg-white rounded-lg shadow-md p-8 text-center">
                             <p className="text-gray-600 text-lg mb-4">Anda belum memiliki pesanan.</p>
                             <p className="text-gray-500">Mulai belanja dari <Link href={route('catalogs')} className="text-[#161D6F] hover:underline">katalog</Link> kami!</p>
                         </div>
                     ) : (
                         <div className="space-y-8">
-                            {orders.map((order) => (
+                            {orders.map((order) => ( // Melakukan map jika ada pesanan
                                 <div key={order.id} className="bg-white rounded-lg shadow-sm">
                                     <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
@@ -183,6 +206,5 @@ export default function OrderHistory({ auth }) {
                 <Footer />
             </div>
         </>
-
     );
 }
