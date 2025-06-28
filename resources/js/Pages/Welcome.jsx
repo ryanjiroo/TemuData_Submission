@@ -47,7 +47,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <div className="space-y-8">
                             <div className="bg-[#C7FFD8] rounded-lg overflow-hidden shadow-md">
                                 <img
-                                    src="https://raw.githubusercontent.com/ryanjiroo/TemuData_Submission/refs/heads/main/public/images/works.jpg"
+                                    src="https://raw.githubusercontent.com/ryanjiroo/TemuData_Submission/refs/heads/main/public/images/teamlearning.jpg"
                                     alt="Team Learning"
                                     className="w-full h-auto object-cover rounded-lg"
                                 />
