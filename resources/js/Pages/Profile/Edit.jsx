@@ -33,6 +33,7 @@ export default function Edit({ mustVerifyEmail, status, auth }) {
             </div>
             <Footer/>
         </>
+        
 
     );
 }
