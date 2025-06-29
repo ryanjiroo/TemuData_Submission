@@ -136,7 +136,7 @@ function Catalog({ catalogs, auth }) {
                                             {catalog.title}
                                         </h3>
                                         <p className="text-gray-600 text-sm leading-relaxed flex-grow mb-3">
-                                            {catalog.description ? catalog.description.substring(0, 100) + (catalog.description.length > 100 ? '...' : '') : ''}
+                                            {catalog.description || ''}
                                         </p>
                                         <div className="flex justify-between items-center mt-auto">
                                             <p className="text-2xl font-bold text-[#161D6F]">
