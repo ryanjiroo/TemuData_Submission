@@ -27,9 +27,9 @@ export default function GuestLayout({ children }) {
                     </div>
 
                     <div className="relative z-10 text-white text-center">
-                        <h2 className="text-4xl font-bold mb-4">Mulai Proyek Baru Anda.</h2>
+                        <h2 className="text-4xl font-bold mb-4">Mulai Perjalanan Anda.</h2>
                         <p className="text-lg opacity-80 mb-6">
-                            Transformasi ide menjadi kenyataan dengan platform pengembangan terdepan.
+                            Transformasikan semangat belajarmu menjadi keahlian nyata dengan program pelatihan dan mentoring data science terbaik.
                         </p>
                         <div className="flex justify-center space-x-6">
                             <svg className="w-12 h-12 text-[#C7FFD8]" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 8a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H6a1 1 0 01-1-1z"></path></svg>
