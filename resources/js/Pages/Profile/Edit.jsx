@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
-import Navbar from './Components/Navbar';
-import Footer from './Components/Footer';
+import Navbar from '@/Components/Navbar';
+import Footer from '@/Components/Footer';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
